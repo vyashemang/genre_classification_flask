@@ -7,6 +7,7 @@ from sklearn.preprocessing import MinMaxScaler
 app = Flask(__name__,template_folder='template')
 
 model = pickle.load(open('model_svm.pkl','rb'))
+scaler = pickle.load(open('scaler.pkl','rb'))
 
 def getmetadata(filename):
     y, sr = librosa.load(filename)
@@ -70,15 +71,15 @@ def success():
             file_name = 'Upload only wav file'
         else:
             file_name = f.filename
+        genre = {0: 'blues', 1: 'classical', 2: 'country', 3: 'disco', 4: 'hiphop', 5: 'jazz', 6: 'metal', 7: 'pop', 8: 'reggae',9: 'rock'}
 
         mtdt = getmetadata(f.filename)
         mtdt = np.array(list(mtdt.values()))
         mtdt.reshape(-1,1)
-
-        pred_genre = model.predict([mtdt])
-
-
-        return render_template("success.html", name = file_name, genre = pred_genre[0])
+        mtdt_scaled = scaler.transform([mtdt])
+        pred_genre = model.predict(mtdt_scaled)
+        genre_name = genre[pred_genre[0]]
+        return render_template("success.html", name = file_name, genre = genre_name)
 
 if __name__ == '__main__':
     app.run(debug = True)
