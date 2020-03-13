@@ -29,6 +29,8 @@ X_train_scaled = scaler.fit_transform(X_train)
 # we must apply the scaling to the test set that we computed for the training set
 X_test_scaled = scaler.transform(X_test)
 
+pickle.dump(scaler,open('scaler.pkl','wb'))
+
 knn = KNeighborsClassifier(n_neighbors = 10)
 knn.fit(X_train_scaled, y_train)
 #print(knn.score(X_test_scaled, y_test))
